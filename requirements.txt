@@ -4,6 +4,7 @@ pymongo
 motor
 langchain
 langchain-google-genai
+langchain-community
 firebase-admin
 python-dotenv
 pydantic
