@@ -1,4 +1,5 @@
 import os
+import json
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import firebase_admin
@@ -7,17 +8,33 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Initialize Firebase Admin SDK
-# The service account key is expected to be in a JSON file pointed to by an environment variable.
-# For security, the service account key itself should not be hardcoded.
-cred_path = os.getenv("FIREBASE_ADMIN_SDK_SERVICE_ACCOUNT_KEY_PATH")
-if not cred_path:
-    raise ValueError("The FIREBASE_ADMIN_SDK_SERVICE_ACCOUNT_KEY_PATH environment variable must be set.")
+# --- Firebase Admin SDK Initialization ---
+# This logic supports both local development (using a file path) and
+# cloud deployment (using a JSON string in an environment variable).
 
-# Check if the app is already initialized to prevent errors
 if not firebase_admin._apps:
-    cred = credentials.Certificate(cred_path)
-    firebase_admin.initialize_app(cred)
+    cred_json_str = os.getenv("FIREBASE_CREDENTIALS_JSON")
+    cred_path = os.getenv("FIREBASE_ADMIN_SDK_SERVICE_ACCOUNT_KEY_PATH")
+
+    cred_obj = None
+    if cred_json_str:
+        # For cloud deployment: load credentials from the JSON string.
+        try:
+            cred_obj = credentials.Certificate(json.loads(cred_json_str))
+        except json.JSONDecodeError:
+            raise ValueError("Failed to parse FIREBASE_CREDENTIALS_JSON.")
+    elif cred_path:
+        # For local development: load credentials from the file path.
+        cred_obj = credentials.Certificate(cred_path)
+
+    if cred_obj:
+        firebase_admin.initialize_app(cred_obj)
+    else:
+        # If neither is set, the application cannot start.
+        raise ValueError(
+            "Firebase credentials not found. Set either FIREBASE_CREDENTIALS_JSON "
+            "or FIREBASE_ADMIN_SDK_SERVICE_ACCOUNT_KEY_PATH."
+        )
 
 oauth2_scheme = HTTPBearer()
 
