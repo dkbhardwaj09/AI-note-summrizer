@@ -45,29 +45,44 @@ This project provides a secure, robust FastAPI backend that combines two main fu
 
 ## Environment Variables
 
-To run the application, you need to create a `.env` file in the root directory of the project. This file will store your sensitive credentials.
+The application requires environment variables for configuration. The method for setting them depends on your environment (local development vs. cloud deployment).
 
-1.  Create the file:
-    ```bash
-    touch .env
-    ```
+### For Local Development
 
-2.  Add the following variables to the `.env` file:
+For local development, create a `.env` file in the project root:
 
-    ```env
-    # Your MongoDB Atlas connection string
-    MONGO_URI="mongodb+srv://<user>:<password>@<cluster-url>/"
+```bash
+touch .env
+```
 
-    # Your Google AI API Key for Gemini and Embeddings
-    GOOGLE_API_KEY="your_google_api_key"
+Add the following variables to it:
 
-    # The absolute path to your Firebase Admin SDK service account JSON file
-    FIREBASE_ADMIN_SDK_SERVICE_ACCOUNT_KEY_PATH="/path/to/your/firebase-service-account.json"
-    ```
+```env
+# Your MongoDB Atlas connection string
+MONGO_URI="mongodb+srv://<user>:<password>@<cluster-url>/"
 
-    **Important**:
-    - You must have a MongoDB Atlas cluster with a Vector Search index configured on the `pdf_vectors` collection. The index should be named `vector_index`.
-    - You need to obtain a service account key from your Firebase project settings.
+# Your Google AI API Key for Gemini and Embeddings
+GOOGLE_API_KEY="your_google_api_key"
+
+# The absolute path to your Firebase Admin SDK service account JSON file
+FIREBASE_ADMIN_SDK_SERVICE_ACCOUNT_KEY_PATH="/path/to/your/firebase-service-account.json"
+```
+
+### For Cloud Deployment (e.g., Render, Fly.io)
+
+When deploying to a hosting service, you cannot use a local file path for the Firebase credentials. Instead, you must use the `FIREBASE_CREDENTIALS_JSON` variable.
+
+1.  In your hosting provider's dashboard (e.g., Render), navigate to the "Environment" or "Secrets" section for your service.
+2.  Set the following environment variables:
+    - `MONGO_URI`: Your MongoDB connection string.
+    - `GOOGLE_API_KEY`: Your Google AI API key.
+    - `PYTHON_VERSION`: `3.10.18`
+    - `FIREBASE_CREDENTIALS_JSON`: Copy the **entire content** of your Firebase service account JSON file and paste it as the value for this variable. It will be a long, single-line string.
+
+**Important Notes**:
+- The application prioritizes `FIREBASE_CREDENTIALS_JSON`. If it is set, it will be used. Otherwise, the app will look for `FIREBASE_ADMIN_SDK_SERVICE_ACCOUNT_KEY_PATH`.
+- You must have a MongoDB Atlas cluster with a Vector Search index configured on the `pdf_vectors` collection. The index should be named `vector_index`.
+- You need to obtain a service account key from your Firebase project settings.
 
 ## Running the Application
 
