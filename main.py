@@ -1,8 +1,9 @@
 from fastapi import FastAPI, Depends
 from routes.note import note
+from routes.rag import rag
 from fastapi.staticfiles import StaticFiles
 from auth.middleware import get_current_user
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, FileResponse
 
 app = FastAPI(
     title="Unified Notes and RAG API",
@@ -10,21 +11,28 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Mount static files if you have a frontend build to serve
-# app.mount("/static", StaticFiles(directory="static"), name="static")
-
-# Include existing and future routers
-from routes.rag import rag
-
+# --- API Routers ---
+# All API endpoints are prefixed with /api
 app.include_router(note, prefix="/api")
 app.include_router(rag, prefix="/api")
 
-# Root endpoint for health checks
-@app.get("/", tags=["Health Check"])
+# --- Frontend Serving ---
+# Mount the 'public' directory to serve static files like CSS and JS
+app.mount("/static", StaticFiles(directory="public"), name="static")
+
+@app.get("/", include_in_schema=False)
+async def read_index():
+    """
+    Serves the main index.html file for the frontend.
+    """
+    return FileResponse('public/index.html')
+
+# --- Health Check / Test Endpoints ---
+@app.get("/api/health", tags=["Health Check"])
 async def read_root():
+    """A simple health check endpoint to confirm the API is running."""
     return {"status": "API is running"}
 
-# A sample secure endpoint to test the authentication middleware
 @app.get("/api/secure-data", tags=["Authentication Test"])
 async def get_secure_data(user: dict = Depends(get_current_user)):
     """
