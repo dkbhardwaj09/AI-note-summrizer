@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes & PDF Chat API</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <h1>Notes & PDF Chat API Frontend</h1>
+        <p>A simple frontend to demonstrate the API's capabilities.</p>
+    </header>
+
+    <main class="container">
+        <!-- Authentication Section -->
+        <section class="card">
+            <h2>1. Authentication</h2>
+            <p>
+                To use the API, you must provide a valid Firebase ID Token.
+                Since this is a simple demo, you'll need to get this token from your own Firebase client application.
+            </p>
+            <textarea id="firebase-token" placeholder="Paste your Firebase ID Token here..." rows="4"></textarea>
+            <button id="save-token-btn">Save Token</button>
+            <p id="auth-status" class="status-message">Status: No Token Set</p>
+        </section>
+
+        <!-- Notes Section -->
+        <section class="card">
+            <h2>2. Notes CRUD</h2>
+            <form id="note-form">
+                <input type="text" id="note-title" placeholder="Note Title" required>
+                <textarea id="note-desc" placeholder="Note Description" rows="3" required></textarea>
+                <label>
+                    <input type="checkbox" id="note-important"> Important
+                </label>
+                <button type="submit">Add Note</button>
+            </form>
+            <hr>
+            <h3>Your Notes</h3>
+            <div id="notes-list">
+                <p>Notes will appear here after you add them...</p>
+            </div>
+        </section>
+
+        <!-- RAG PDF Chat Section -->
+        <section class="card">
+            <h2>3. PDF Chat (RAG)</h2>
+
+            <!-- PDF Upload -->
+            <div class="sub-section">
+                <h3>Upload a PDF</h3>
+                <form id="upload-form">
+                    <input type="file" id="pdf-file" accept=".pdf" required>
+                    <button type="submit">Upload & Process PDF</button>
+                </form>
+                <div id="upload-status" class="status-message"></div>
+                <p>Current File ID for Chat: <strong id="current-file-id">None</strong></p>
+            </div>
+
+            <!-- Chat Interface -->
+            <div class="sub-section">
+                <h3>Chat with your PDF</h3>
+                <div id="chat-container">
+                    <div id="chat-box">
+                        <p class="bot-message">Please upload a PDF to begin chatting.</p>
+                    </div>
+                    <form id="chat-form">
+                        <input type="text" id="chat-input" placeholder="Ask a question about your PDF..." disabled>
+                        <button type="submit" id="send-chat-btn" disabled>Send</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
