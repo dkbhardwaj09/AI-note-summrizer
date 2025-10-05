@@ -11,3 +11,4 @@ pydantic
 PyPDF2
 tiktoken
 google-generativeai
+python-multipart
